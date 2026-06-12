@@ -1,32 +1,37 @@
-name: Build APEX Engine
+name: APEX Motoru Olusturma
 
 on:
-  workflow_dispatch: # Bu komut telefondan "Derle" butonuna elle basmanı sağlayacak
+  workflow_dispatch:
 
 jobs:
   build:
     runs-on: windows-latest
 
     steps:
-    - name: Download Engine Zip from Cloud
+    - name: Motor Zip dosyasini buluttan indirin.
       shell: powershell
       run: |
-        # Aşağıdaki tırnak içindeki link yerine Catbox'tan aldığın linki yapıştır!
+        # Catbox linkini buraya tırnakların içine yapıştır!
         Invoke-WebRequest -Uri "https://files.catbox.moe/nhyjzj.zip" -OutFile "APEX_Engine.zip"
 
-    - name: Unzip Engine Files
+    - name: Motor Dosyalarini Ac
       shell: powershell
       run: |
         Expand-Archive -Path .\APEX_Engine.zip -DestinationPath .\ExtractedEngine
 
-    - name: Configure CMake
-      run: cmake -B build -S .\ExtractedEngine
+    - name: GLFW Kutuphanesini Kur (vcpkg)
+      run: vcpkg install glfw3:x64-windows
 
-    - name: Build Engine
+    - name: CMake'i yapilandirin
+      run: cmake -B build -S .\ExtractedEngine -DCMAKE_TOOLCHAIN_FILE="C:/vcpkg/scripts/buildsystems/vcpkg.cmake"
+
+    - name: Derleme Motoru
       run: cmake --build build --config Release
 
-    - name: Upload Build Artifacts
+    - name: Derleme Yapitlarini Yukle
       uses: actions/upload-artifact@v4
       with:
         name: APEX_Engine_Executable
         path: build/Release/
+
+        
