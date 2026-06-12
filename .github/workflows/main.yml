@@ -1,0 +1,32 @@
+name: Build APEX Engine
+
+on:
+  workflow_dispatch: # Bu komut telefondan "Derle" butonuna elle basmanı sağlayacak
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+    - name: Download Engine Zip from Cloud
+      shell: powershell
+      run: |
+        # Aşağıdaki tırnak içindeki link yerine Catbox'tan aldığın linki yapıştır!
+        Invoke-WebRequest -Uri "https://files.catbox.moe/nhyjzj.zip" -OutFile "APEX_Engine.zip"
+
+    - name: Unzip Engine Files
+      shell: powershell
+      run: |
+        Expand-Archive -Path .\APEX_Engine.zip -DestinationPath .\ExtractedEngine
+
+    - name: Configure CMake
+      run: cmake -B build -S .\ExtractedEngine
+
+    - name: Build Engine
+      run: cmake --build build --config Release
+
+    - name: Upload Build Artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: APEX_Engine_Executable
+        path: build/Release/
